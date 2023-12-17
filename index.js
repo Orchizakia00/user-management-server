@@ -77,10 +77,40 @@ async function run() {
             res.send(result);
         })
 
+        // app.patch('/logged-users/:email', async (req, res) => {
+        //     const email = req.params.email;
+        //     const filter = { email };
+        //     const updatedDoc = {
+        //         $set: {
+        //             action: 'fired'
+        //         }
+        //     }
+        //     const result = await userCollection.updateOne(filter, updatedDoc);
+        //     res.send(result);
+        // })
+
+        app.patch('/logged-users/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email }
+            const updatedInfo= req.body;
+            const product = {
+                $set: {
+                    name: updatedInfo.name,
+                    email: updatedInfo.email,
+                    phone: updatedInfo.phone,
+                    gender: updatedInfo.gender,
+                    source: updatedInfo.source,
+                    city: updatedInfo.city,
+                    state: updatedInfo.state,
+                }
+            }
+            const result = await loggedUserCollection.updateOne(filter, product);
+            res.send(result);
+        })
 
 
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
