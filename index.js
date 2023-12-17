@@ -25,6 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const userCollection = client.db('jobUserDB').collection('users');
+        const loggedUserCollection = client.db('jobUserDB').collection('loggedUsers');
 
         app.get('/users', async (req, res) => {
             const result = await userCollection.find().toArray();
@@ -43,10 +44,36 @@ async function run() {
             res.send(result);
         })
 
-        app.delete('/users/:id', async(req, res) => {
+        app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await userCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // logged-users api
+        app.post('/logged-users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email }
+            const existingUser = await loggedUserCollection.findOne(query);
+            if (existingUser) {
+                return res.send({ message: 'user already exist', insertedId: null })
+            };
+
+            const result = await loggedUserCollection.insertOne(user);
+            res.send(result);
+        });
+
+        app.get('/logged-users', async (req, res) => {
+            const result = await loggedUserCollection.find().toArray();
+            res.send(result);
+        })
+
+
+        app.get('/logged-users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const result = await loggedUserCollection.findOne(query);
             res.send(result);
         })
 
